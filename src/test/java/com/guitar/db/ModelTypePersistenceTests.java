@@ -1,6 +1,10 @@
 package com.guitar.db;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -13,6 +17,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.guitar.db.model.ModelType;
+import com.guitar.db.repository.ModelTypeJpaRepository;
 import com.guitar.db.repository.ModelTypeRepository;
 
 @ContextConfiguration(locations={"classpath:com/guitar/db/applicationTests-context.xml"})
@@ -20,10 +25,13 @@ import com.guitar.db.repository.ModelTypeRepository;
 public class ModelTypePersistenceTests {
 	@Autowired
 	private ModelTypeRepository modelTypeRepository;
+	
+	@Autowired
+	private ModelTypeJpaRepository modelTypeJpaRepository;
 
 	@PersistenceContext
 	private EntityManager entityManager;
-
+		
 	@Test
 	@Transactional
 	public void testSaveAndGetAndDelete() throws Exception {
@@ -40,10 +48,35 @@ public class ModelTypePersistenceTests {
 		
 		modelTypeRepository.delete(otherModelType);
 	}
-
+	
 	@Test
 	public void testFind() throws Exception {
 		ModelType mt = modelTypeRepository.find(1L);
+		assertEquals("Dreadnought Acoustic", mt.getName());
+	}
+	
+	@Test
+	@Transactional
+	public void testJpaSaveAndGetAndDelete() throws Exception {
+		ModelType mt = new ModelType();
+		mt.setName("Test Model Type");
+		
+		mt = modelTypeJpaRepository.save(mt);
+		
+		// clear the persistence context so we don't return the previously cached location object
+		// this is a test only thing and normally doesn't need to be done in prod code
+		entityManager.clear();
+		
+		Optional<ModelType> otherModelType = modelTypeJpaRepository.findById(mt.getId());
+		if(otherModelType.isPresent()) {
+			assertEquals("Test Model Type", otherModelType.get().getName());
+			modelTypeJpaRepository.deleteById(mt.getId());
+		}
+	}
+	
+	@Test
+	public void testJpaFind() throws Exception{
+		ModelType mt = modelTypeJpaRepository.findById(1L).orElse(null);
 		assertEquals("Dreadnought Acoustic", mt.getName());
 	}
 }

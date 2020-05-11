@@ -1,6 +1,7 @@
 package com.guitar.db;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -17,6 +18,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.guitar.db.model.Model;
+import com.guitar.db.repository.ModelJpaRepository;
 import com.guitar.db.repository.ModelRepository;
 
 @ContextConfiguration(locations={"classpath:com/guitar/db/applicationTests-context.xml"})
@@ -24,9 +26,19 @@ import com.guitar.db.repository.ModelRepository;
 public class ModelPersistenceTests {
 	@Autowired
 	private ModelRepository modelRepository;
+	
+	@Autowired
+	private ModelJpaRepository modelJpaRepository;
 
 	@PersistenceContext
 	private EntityManager entityManager;
+
+	@Test
+	public void testJpafind() throws Exception {
+		List<Model> modelsJpa = modelJpaRepository.findAll();
+		assertNotNull(modelsJpa);
+	}
+	
 
 	@Test
 	@Transactional
