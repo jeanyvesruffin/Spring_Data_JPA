@@ -1,0 +1,4 @@
+com\guitar\db\LocationPersistenceTests.class
+com\guitar\db\ModelTypePersistenceTests.class
+com\guitar\db\ManufacturerPersistenceTests.class
+com\guitar\db\ModelPersistenceTests.class
