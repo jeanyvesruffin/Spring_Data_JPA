@@ -2,10 +2,12 @@ package com.guitar.db.repository;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.guitar.db.model.Manufacturer;
@@ -15,41 +17,60 @@ public class ManufacturerRepository {
 	@PersistenceContext
 	private EntityManager entityManager;
 
+	@Autowired
+	private ManufacturerJpaRepository manufacturerJpaRepository;
+	
+	
 	/**
-	 * Create
+	 * Create sans proxy repository
 	 */
-	public Manufacturer create(Manufacturer man) {
+	/*public Manufacturer create(Manufacturer man) {
 		entityManager.persist(man);
 		entityManager.flush();
 		return man;
+	}*/
+	public Manufacturer create(Manufacturer man) {
+		return manufacturerJpaRepository.saveAndFlush(man);
 	}
-
+	
+	
 	/**
-	 * Update
+	 * Update sans proxy repository
 	 */
-	public Manufacturer update(Manufacturer man) {
+	/*public Manufacturer update(Manufacturer man) {
 		man = entityManager.merge(man);
 		entityManager.flush();
 		return man;
+	}*/
+	
+	public Manufacturer update(Manufacturer man) {
+		return manufacturerJpaRepository.saveAndFlush(man);
 	}
 
 	/**
-	 * Delete
+	 * Delete sans proxy repository
 	 */
-	public void delete(Manufacturer man) {
+	/*public void delete(Manufacturer man) {
 		entityManager.remove(man);
 		entityManager.flush();
+	}*/
+	
+	public void delete(Manufacturer man) {
+		manufacturerJpaRepository.delete(man);
 	}
-
+	
 	/**
-	 * Find
+	 * Find sans proxy repository
 	 */
-	public Manufacturer find(Long id) {
+	/*public Manufacturer find(Long id) {
 		return entityManager.find(Manufacturer.class, id);
+	}*/
+	public Optional<Manufacturer> find(Long id) {
+		return manufacturerJpaRepository.findById(id);
 	}
 
 	/**
-	 * Custom finder
+	 * Custom finder 
 	 */
 	public List<Manufacturer> getManufacturersFoundedBeforeDate(Date date) {
 		@SuppressWarnings("unchecked")

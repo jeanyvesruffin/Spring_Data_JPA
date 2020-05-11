@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -39,7 +40,6 @@ public class ModelPersistenceTests {
 		assertNotNull(modelsJpa);
 	}
 	
-
 	@Test
 	@Transactional
 	public void testSaveAndGetAndDelete() throws Exception {
@@ -55,12 +55,33 @@ public class ModelPersistenceTests {
 		// this is a test only thing and normally doesn't need to be done in prod code
 		entityManager.clear();
 
-		Model otherModel = modelRepository.find(m.getId());
-		assertEquals("Test Model", otherModel.getName());
-		assertEquals(10, otherModel.getFrets());
-		
-		//delete BC location now
-		modelRepository.delete(otherModel);
+		Optional<Model> otherModel = modelRepository.find(m.getId());
+		if(otherModel.isPresent()) {
+			assertEquals("Test Model", otherModel.get().getName());
+			assertEquals(10, otherModel.get().getFrets());
+			
+			//delete BC location now
+			modelRepository.delete(otherModel.get());			
+		}
+	}
+	
+	@Test
+	@Transactional
+	public void testJpaSaveAndGetAndDelete() throws Exception {
+		Model m = new Model();
+		m.setFrets(10);
+		m.setName("Test Model");
+		m.setPrice(BigDecimal.valueOf(55L));
+		m.setWoodType("Maple");
+		m.setYearFirstMade(new Date());
+		m = modelJpaRepository.save(m);
+		entityManager.clear();
+		Optional<Model> otherModel = modelJpaRepository.findById(m.getId());
+		if(otherModel.isPresent()) {
+			assertEquals("Test Model", otherModel.get().getName());
+			assertEquals(10, otherModel.get().getFrets());
+			modelJpaRepository.deleteById(otherModel.get().getId());			
+		}
 	}
 
 	@Test

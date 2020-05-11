@@ -2,12 +2,14 @@ package com.guitar.db.repository;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.guitar.db.model.Model;
@@ -17,37 +19,52 @@ public class ModelRepository {
 	@PersistenceContext
 	private EntityManager entityManager;
 
+	@Autowired
+	private ModelJpaRepository modelJpaRepository;
+	
 	/**
-	 * Create
+	 * Create sans proxy repository
 	 */
-	public Model create(Model mod) {
+	/*public Model create(Model mod) {
 		entityManager.persist(mod);
 		entityManager.flush();
 		return mod;
+	}*/
+	public Model create(Model mod) {
+		return modelJpaRepository.saveAndFlush(mod);
 	}
 
 	/**
-	 * Update
+	 * Update sans proxy repository
 	 */
-	public Model update(Model mod) {
+	/*public Model update(Model mod) {
 		mod = entityManager.merge(mod);
 		entityManager.flush();
 		return mod;
+	}*/
+	public Model update(Model mod) {
+		return modelJpaRepository.saveAndFlush(mod);
 	}
 
 	/**
-	 * Delete
+	 * Delete sans proxy repository
 	 */
-	public void delete(Model mod) {
+	/*public void delete(Model mod) {
 		entityManager.remove(mod);
 		entityManager.flush();
+	}*/
+	public void delete(Model mod) {
+		modelJpaRepository.delete(mod);
 	}
 
 	/**
-	 * Find
+	 * Find sans proxy repository
 	 */
-	public Model find(Long id) {
+	/*public Model find(Long id) {
 		return entityManager.find(Model.class, id);
+	}*/
+	public Optional<Model> find(Long id) {
+		return modelJpaRepository.findById(id);
 	}
 
 	/**

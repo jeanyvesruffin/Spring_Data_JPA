@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -40,7 +41,6 @@ public class LocationPersistenceTests {
 		assertNotNull(locationsJpa);
 	}
 	
-	
 	@Test
 	@Transactional
 	public void testSaveAndGetAndDelete() throws Exception {
@@ -60,11 +60,48 @@ public class LocationPersistenceTests {
 		//delete BC location now
 		locationRepository.delete(otherLocation);
 	}
+	
+	@Test
+	@Transactional
+	public void testJpaSaveAndGetAndDelete() throws Exception {
+		Location location = new Location();
+		location.setCountry("Canada");
+		location.setState("British Columbia");
+		location = locationJpaRepository.save(location);
+		entityManager.clear();
+		Optional<Location> otherLocation = locationJpaRepository.findById(location.getId());
+		if(otherLocation.isPresent()) {
+			assertEquals("Canada", otherLocation.get().getCountry());
+			assertEquals("British Columbia", otherLocation.get().getState());
+			locationJpaRepository.deleteById(otherLocation.get().getId());			
+		}
+	}
+	@Test
+	@Transactional
+	public void testJpaProxySaveAndGetAndDelete() throws Exception {
+		Location location = new Location();
+		location.setCountry("Canada");
+		location.setState("British Columbia");
+		location = locationJpaRepository.saveAndFlush(location);
+		entityManager.clear();
+		Optional<Location> otherLocation = locationJpaRepository.findById(location.getId());
+		if(otherLocation.isPresent()) {
+			assertEquals("Canada", otherLocation.get().getCountry());
+			assertEquals("British Columbia", otherLocation.get().getState());
+			locationJpaRepository.deleteById(otherLocation.get().getId());			
+		}
+	}
 
 	@Test
 	public void testFindWithLike() throws Exception {
 		List<Location> locs = locationRepository.getLocationByStateName("New");
 		assertEquals(4, locs.size());
+	}
+	
+	@Test
+	public void testJpaProxyFindWithLike() throws Exception {
+		List<Location> locs = locationJpaRepository.findByStateLike("New%");
+		assertEquals(50, locs.size());
 	}
 
 	@Test
@@ -73,9 +110,18 @@ public class LocationPersistenceTests {
 		Location arizona = locationRepository.find(3L);
 		assertEquals("United States", arizona.getCountry());
 		assertEquals("Arizona", arizona.getState());
-		
 		assertEquals(1, arizona.getManufacturers().size());
-		
 		assertEquals("Fender Musical Instruments Corporation", arizona.getManufacturers().get(0).getName());
+	}
+	@Test
+	@Transactional
+	public void testJpaProxyFindWithChildren() throws Exception {
+		Optional<Location> arizona = locationJpaRepository.findById(3L);
+		if(arizona.isPresent()) {
+			assertEquals("United States", arizona.get().getCountry());
+			assertEquals("Arizona", arizona.get().getState());			
+			assertEquals(1, arizona.get().getManufacturers().size());
+			assertEquals("Fender Musical Instruments Corporation", arizona.get().getManufacturers().get(0).getName());
+		}
 	}
 }
