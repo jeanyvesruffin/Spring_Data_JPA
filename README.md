@@ -1,11 +1,34 @@
 # Spring_Data_JPA
 
-Ce module nous montre comment est mise en oeuvre Spring_Data_JPA.
+Ce module nous montre comment sont gérés les données avec Spring à travers Java Persistence API (JPA).
 
-Java Persistence API, nous permet de maintenir les données persistantes. 
-La couche Spring nous permet de Create Read Update Delete (CRUD) ces données.
+La couche Spring nous permettra de Create Read Update Delete (CRUD) nos données.
+
 De plus nous verrons comment ecrire les query à l'aide d'une syntaxe DSL (Domain Specific Language) utilisant des mots clé (keyword).
-Enfin nous irons plus loin dans les query et ces possibilités.
+
+Nous irons, enfin, plus loin dans les possibilités de query.
+
+La vérification de la mise en oeuvre de Spring_Data_JPA sera réaliser dans les tests.
+
+## Rappel javax et definition
+
+**javax.persistence** classe mère nous permettant de maintenir des données persistantes à travers une instance d' EntityManager, annoté, @PersistenceContext
+
+		@PersistenceContext
+		private EntityManager entityManager;
+
+Nous pourrons ainsi écrire nos requetes à travers l'api **JPA** qui maintiendra des données persistantes, avec **JPQL**: Java Persistence Query Language, qui sera la pour nous donner acces au méthode pour la declaration des syntaxe SQL.
+
+Exemple:
+
+	public List<Model> getModelsInPriceRange(BigDecimal lowest, BigDecimal highest) {
+			List<Model> mods = entityManager //====>Acces JPA 
+					.createQuery("select m from Model m where m.price >= :lowest and m.price <= :highest")//====>Syntaxe JPQL
+					.setParameter("lowest", lowest)//====>Parametres requete SQL
+					.setParameter("highest", highest).getResultList();//====>Parametres requete SQL
+			return mods;
+		}
+
 
 
 ## Installation Spring JPA et test
@@ -401,6 +424,8 @@ Exemple JPQL :
 Exemple Keyword :
 
 	findByPriceGreaterThanAndLessThan(10,20)
+
+** Attention nous avions avant tous ecris les JPQL
 
 Exemple dans le fichier LocationJpaRepository:
 	
