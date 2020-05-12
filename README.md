@@ -184,13 +184,189 @@ Exemple:
 	public interface LocationJpaRepository extends JpaRepository<Location, Long>{
 		// Permet de retourner une ligne contenant Location
 		Location findFirstByState(String stateName);
-		// Permet de retourner plus de ligne 
+		// Permet de retourner une liste de ligne 
 		List<Location> findByStateLike(String stateName);
 		// Permet de retourner un compteur de valeurs
 		Long countByStateLike(String stateName);
 	}	
 
-## Keyword
+## Keyword for query And et Or
+
+Utilisation : Combine plusieurs filtres de requête à critères en utilisant une condition And ou Or.
+
+Exemple Keyword :
+
+	findByStateAndCountry("CA","USA");
+	findByStateOrState("CA","AZ");
+
+Exemple JPQL :
+	
+	...WHERE a.state=?1 AND a.country=?2
+	...WHERE a.state=?1 OR a.state=?2
+	
+Exemple dans le fichier LocationJpaRepository:
+
+	...
+	List<Location>findByStateOrCountry(String value,String value2); 
+	List<Location>findByStateAndCountry(String state,String country); 
+	...
+	
+Avec comme test associé
+
+	...
+	@Test
+	public void testJpaAnd() throws Exception{
+		List<Location> locationsJpa = locationJpaRepository.findByStateAndCountry("Utah", "United States");
+		assertNotNull(locationsJpa);
+		assertEquals("Utah", locationsJpa.get(43).getState());
+	}
+	...
+	
+	Console log:
+	Hibernate: select l1_0.id, l1_0.country, l1_0.state from Location as l1_0 where l1_0.state = ? and l1_0.country = ?
+	
+	...
+	@Test
+	public void testJpaOr() throws Exception{
+		List<Location> locationsJpa = locationJpaRepository.findByStateOrCountry("Utah", "Utah");
+		assertNotNull(locationsJpa);
+		assertEquals("Utah", locationsJpa.get(43).getState());
+	}
+	...
+	
+	Console log:
+	Hibernate: select l1_0.id, l1_0.country, l1_0.state from Location as l1_0 where l1_0.state = ? or l1_0.country = ?
+	
+## Keyword for query Equals, Is et Not
+
+Utilisation : La valeur par défaut pour comparer des criteres avec la valeur du filtre est '='. Utiliser 'Not' pour comparer des valeurs differentes.
+
+Exemple Keyword :
+
+	findByState("CA");
+	findByStateIs("CA");
+	findByStateEquals("CA");
+	findByStateNot("CA");
+	
+Exemple JPQL :
+	
+	...WHERE a.state=?1
+	...WHERE a.state=?1
+	...WHERE a.state=?1
+	...WHERE a.state<>?1
+
+Exemple dans le fichier LocationJpaRepository:
+
+	...
+	List<Location>findByStateIsOrCountryEquals(String value,String value2);
+	List<Location>findByStateNot(String state);
+	...
+
+Avec comme test associé:
+
+	...
+	@Test
+	public void testJpaIsEquals() throws Exception{
+		List<Location> locationsJpa = locationJpaRepository.findByStateIsOrCountryEquals("Utah", "Utah");
+		assertNotNull(locationsJpa);
+		assertEquals("Utah", locationsJpa.get(43).getState());
+	}
+	...
+	
+	console log:
+	Hibernate: select l1_0.id, l1_0.country, l1_0.state from Location as l1_0 where l1_0.state = ? or l1_0.country = ?
+	
+	...
+	@Test
+	public void testJpaNot() throws Exception{
+		List<Location> locationsJpa = locationJpaRepository.findByStateNot("Utah");
+		assertNotNull(locationsJpa);
+		assertNotSame("Utah", locationsJpa.get(43).getState());
+	}
+	...
+	
+	console log:
+	Hibernate: select l1_0.id, l1_0.country, l1_0.state from Location as l1_0 where l1_0.state != ?
+	
+## Keyword for query Like, NotLike
+
+Utilisation: Utile lorsque vous essayez de faire correspondre ou de ne pas faire correspondre une partie de la valeur du filtre de critères.
+
+Exemple Keyword :
+
+	findByStateLike("CA%");
+	findByStateNotLike("AI%");
+	
+Exemple JPQL :
+	
+	...WHERE a.state like?1
+	...WHERE a.state not like?1
+
+Exemple dans le fichier LocationJpaRepository:
+	
+	...
+	List<Location> findByStateLike(String stateName);
+	List<Location> findByStateNotLike(String stateName);
+	...
+	
+Avec comme test associé:
+	
+	...
+	@Test
+	public void testJpaLike() throws Exception {
+		List<Location> locs = locationJpaRepository.findByStateLike("New%");
+		assertEquals(50, locs.size());
+	}
+	...
+	
+	console log:
+	Hibernate: select l1_0.id, l1_0.country, l1_0.state from Location as l1_0 where l1_0.state like ? escape ?
+	
+	...
+	@Test
+	public void testJpaNotLike() throws Exception {
+		List<Location> locs = locationJpaRepository.findByStateNotLike("New%");
+		assertEquals(5, locs.size());
+	}
+	...
+	
+	console log:
+	Hibernate: select l1_0.id, l1_0.country, l1_0.state from Location as l1_0 where l1_0.state not like ? escape ?
+	
+## Keyword for query startingWith, endingWith et containing
+
+Utilisation: Similaire au mot clé "Like" sauf que le % est automatiquement ajouté à la valeur du filtre.
+
+Exemple Keyword :
+
+	findByStateStartingWith("AI"); //AI%
+	findByStateEndingWith("ia"); //%ia
+	findByStateContaining("in"); //%in%
+	
+Exemple JPQL :
+	
+	...WHERE a.state like?1
+	...WHERE a.state like?1
+	...WHERE a.state like?1
+
+Exemple dans le fichier LocationJpaRepository:
+
+	...
+	List<Location> findByStateStartingWith(String stateName);
+	...
+
+Avec comme test associé:
+
+	...
+	@Test
+	public void testJpaStartingWith() throws Exception {
+		List<Location> locs = locationJpaRepository.findByStateStartingWith("New");
+		assertEquals(50, locs.size());
+	}
+	...
+
+	console log:
+	Hibernate: select l1_0.id, l1_0.country, l1_0.state from Location as l1_0 where l1_0.state like ? escape ?
 
 
 	

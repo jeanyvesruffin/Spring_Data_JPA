@@ -2,6 +2,7 @@ package com.guitar.db;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
 
 
 import java.util.List;
@@ -124,4 +125,60 @@ public class LocationPersistenceTests {
 			assertEquals("Fender Musical Instruments Corporation", arizona.get().getManufacturers().get(0).getName());
 		}
 	}
+	
+	// Test keyword query AND
+	@Test
+	public void testJpaAnd() throws Exception{
+		List<Location> locationsJpa = locationJpaRepository.findByStateAndCountry("Utah", "United States");
+		// Test affirmant que l'objet n'est pas null
+		assertNotNull(locationsJpa);
+		// Test affirmant que l'objet state est Utah et country est United state . 1 parametre => valeur attendue et 2 parametre valeur à tester
+		assertEquals("Utah", locationsJpa.get(43).getState());
+	}
+	// Test keyword query OR
+	@Test
+	public void testJpaOr() throws Exception{
+		List<Location> locationsJpa = locationJpaRepository.findByStateOrCountry("Utah", "Utah");
+		// Test affirmant que l'objet n'est pas null
+		assertNotNull(locationsJpa);
+		// Test affirmant que l'objet est égale à Utah. 1 parametre => valeur attendue et 2 parametre valeur à tester
+		assertEquals("Utah", locationsJpa.get(43).getState());
+	}
+	// Test keyword query Is Or Equals
+	@Test
+	public void testJpaIsEquals() throws Exception{
+		List<Location> locationsJpa = locationJpaRepository.findByStateIsOrCountryEquals("Utah", "Utah");
+		// Test affirmant que l'objet n'est pas null
+		assertNotNull(locationsJpa);
+		// Test affirmant que l'objet est égale à Utah. 1 parametre => valeur attendue et 2 parametre valeur à tester
+		assertEquals("Utah", locationsJpa.get(43).getState());
+	}
+	// Test keyword query Not
+	@Test
+	public void testJpaNot() throws Exception{
+		List<Location> locationsJpa = locationJpaRepository.findByStateNot("Utah");
+		// Test affirmant que l'objet n'est pas null
+		assertNotNull(locationsJpa);
+		// Test affirmant que l'objet est égale à Utah. 1 parametre => valeur attendue et 2 parametre valeur à tester
+		assertNotSame("Utah", locationsJpa.get(43).getState());
+	}
+	
+	// Test keyword like et not like
+	@Test
+	public void testJpaLike() throws Exception {
+		List<Location> locs = locationJpaRepository.findByStateLike("New%");
+		assertEquals(50, locs.size());
+	}
+	@Test
+	public void testJpaNotLike() throws Exception {
+		List<Location> locs = locationJpaRepository.findByStateNotLike("New%");
+		assertEquals(50, locs.size());
+	}
+	// Test keyword starttingWith
+	@Test
+	public void testJpaStartingWith() throws Exception {
+		List<Location> locs = locationJpaRepository.findByStateStartingWith("New");
+		assertEquals(50, locs.size());
+	}
+	
 }
