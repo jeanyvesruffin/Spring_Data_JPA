@@ -1,5 +1,13 @@
 # Spring_Data_JPA
 
+Ce module nous montre comment est mise en oeuvre Spring_Data_JPA.
+
+Java Persistence API, nous permet de maintenir les données persistantes. 
+La couche Spring nous permet de Create Read Update Delete (CRUD) ces données.
+De plus nous verrons comment ecrire les query à l'aide d'une syntaxe DSL (Domain Specific Language) utilisant des mots clé (keyword).
+Enfin nous irons plus loin dans les query et ces possibilités.
+
+
 ## Installation Spring JPA et test
 
 1 - Ajouter la dependence Spring-data-jpa
@@ -368,5 +376,39 @@ Avec comme test associé:
 	console log:
 	Hibernate: select l1_0.id, l1_0.country, l1_0.state from Location as l1_0 where l1_0.state like ? escape ?
 
+## Keyword for query LessThan(Equal) et GreaterThan(Equal)
+
+Utilisation: Utile lorsque vous devez effectuer une comparaison avec des types de données numériques <, <=,> ou> = 
+
+Exemple Keyword :
+
+	findByPriceLessThan(20);
+	findByPriceLessThanEqual(20);
+	findByPriceGreaterThan(20);
+	findByPriceGreaterThanEqual(20);
+
+	
+Exemple JPQL :
+	
+	...WHERE a.price <?1
+	...WHERE a.price <=?1
+	...WHERE a.price >?1
+	...WHERE a.price >=?1
+
+
+**ENCORE PLUS FORT**: Utile lorsque vous devez effectuer un encadrement
+
+Exemple Keyword :
+
+	findByPriceGreaterThanAndLessThan(10,20)
+
+Exemple dans le fichier LocationJpaRepository:
+	
+	...
+	List<Location> findByStateLike(String stateName);
+	List<Location> findByStateNotLike(String stateName);
+	...
+	
+Avec comme test associé:
 
 	
