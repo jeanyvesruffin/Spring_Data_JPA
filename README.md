@@ -9,6 +9,7 @@ De plus nous verrons comment ecrire les query à l'aide d'une syntaxe DSL (Domai
 Nous irons, enfin, plus loin dans les possibilités de query.
 
 La vérification de la mise en oeuvre de Spring_Data_JPA sera réaliser dans les tests.
+Nous utiliserons un serveur H2 en local.
 
 ## Rappel javax et definition
 
@@ -155,7 +156,7 @@ Exemple dans ManufacturerRepository.
 
 1 - Definition des contrats d'interfaces JpaRepository
 
-Exemple dans LocationJpaRepository:
+Dans l'interface LocationJpaRepository:
 
 	...
 	List<Location> findByStateLike(String stateName);
@@ -235,14 +236,14 @@ Exemple JPQL :
 	...WHERE a.state=?1 AND a.country=?2
 	...WHERE a.state=?1 OR a.state=?2
 	
-Exemple dans le fichier LocationJpaRepository:
+Exemple dans l'interface LocationJpaRepository:
 
 	...
 	List<Location>findByStateOrCountry(String value,String value2); 
 	List<Location>findByStateAndCountry(String state,String country); 
 	...
 	
-Avec comme test associé
+Avec comme test associé dans LocationPersistenceTests
 
 	...
 	@Test
@@ -253,9 +254,12 @@ Avec comme test associé
 	}
 	...
 	
-	Console log:
+Console log:
+
 	Hibernate: select l1_0.id, l1_0.country, l1_0.state from Location as l1_0 where l1_0.state = ? and l1_0.country = ?
 	
+Et:
+
 	...
 	@Test
 	public void testJpaOr() throws Exception{
@@ -265,7 +269,8 @@ Avec comme test associé
 	}
 	...
 	
-	Console log:
+Console log:
+
 	Hibernate: select l1_0.id, l1_0.country, l1_0.state from Location as l1_0 where l1_0.state = ? or l1_0.country = ?
 	
 ## Keyword for query Equals, Is et Not
@@ -286,14 +291,14 @@ Exemple JPQL :
 	...WHERE a.state=?1
 	...WHERE a.state<>?1
 
-Exemple dans le fichier LocationJpaRepository:
+Exemple dans l'interface LocationJpaRepository:
 
 	...
 	List<Location>findByStateIsOrCountryEquals(String value,String value2);
 	List<Location>findByStateNot(String state);
 	...
 
-Avec comme test associé:
+Avec comme test associé dans LocationPersistenceTests:
 
 	...
 	@Test
@@ -304,9 +309,12 @@ Avec comme test associé:
 	}
 	...
 	
-	console log:
+Console log:
+
 	Hibernate: select l1_0.id, l1_0.country, l1_0.state from Location as l1_0 where l1_0.state = ? or l1_0.country = ?
 	
+Et :
+
 	...
 	@Test
 	public void testJpaNot() throws Exception{
@@ -316,7 +324,8 @@ Avec comme test associé:
 	}
 	...
 	
-	console log:
+Console log:
+
 	Hibernate: select l1_0.id, l1_0.country, l1_0.state from Location as l1_0 where l1_0.state != ?
 	
 ## Keyword for query Like, NotLike
@@ -333,14 +342,14 @@ Exemple JPQL :
 	...WHERE a.state like?1
 	...WHERE a.state not like?1
 
-Exemple dans le fichier LocationJpaRepository:
+Exemple dans l'interface LocationJpaRepository:
 	
 	...
 	List<Location> findByStateLike(String stateName);
 	List<Location> findByStateNotLike(String stateName);
 	...
 	
-Avec comme test associé:
+Avec comme test associé dans LocationPersistenceTests:
 	
 	...
 	@Test
@@ -350,9 +359,12 @@ Avec comme test associé:
 	}
 	...
 	
-	console log:
+Console log:
+
 	Hibernate: select l1_0.id, l1_0.country, l1_0.state from Location as l1_0 where l1_0.state like ? escape ?
-	
+
+Et:
+
 	...
 	@Test
 	public void testJpaNotLike() throws Exception {
@@ -361,7 +373,8 @@ Avec comme test associé:
 	}
 	...
 	
-	console log:
+console log:
+
 	Hibernate: select l1_0.id, l1_0.country, l1_0.state from Location as l1_0 where l1_0.state not like ? escape ?
 	
 ## Keyword for query startingWith, endingWith et containing
@@ -380,13 +393,13 @@ Exemple JPQL :
 	...WHERE a.state like?1
 	...WHERE a.state like?1
 
-Exemple dans le fichier LocationJpaRepository:
+Exemple dans l'interface LocationJpaRepository:
 
 	...
 	List<Location> findByStateStartingWith(String stateName);
 	...
 
-Avec comme test associé:
+Avec comme test associé dans LocationPersistenceTests:
 
 	...
 	@Test
@@ -396,7 +409,8 @@ Avec comme test associé:
 	}
 	...
 
-	console log:
+Console log:
+
 	Hibernate: select l1_0.id, l1_0.country, l1_0.state from Location as l1_0 where l1_0.state like ? escape ?
 
 ## Keyword for query LessThan(Equal) et GreaterThan(Equal)
@@ -425,15 +439,245 @@ Exemple Keyword :
 
 	findByPriceGreaterThanAndLessThan(10,20)
 
-** Attention nous avions avant tous ecris les JPQL
-
-Exemple dans le fichier LocationJpaRepository:
+Exemple dans l'interface ModelJpaRepository nous allons ajouter au contrat d'interface la methode:
 	
 	...
-	List<Location> findByStateLike(String stateName);
-	List<Location> findByStateNotLike(String stateName);
+	List<Model> findByPriceGreaterThanEqualAndPriceLessThanEqual(BigDecimal lowest, BigDecimal highest);
+	...
+
+On refactorise le code suivant à l'aide du proxy dans ModelRepository:
+
+	public List<Model> getModelsInPriceRange(BigDecimal lowest, BigDecimal highest) {
+			@SuppressWarnings("unchecked")
+			List<Model> mods = entityManager
+					.createQuery("select m from Model m where m.price >= :lowest and m.price <= :highest")
+					.setParameter("lowest", lowest)
+					.setParameter("highest", highest).getResultList();
+			return mods;
+		}
+		
+*Deviens:*
+
+
+	public List<Model> getModelsInPriceRange(BigDecimal lowest, BigDecimal highest) {
+		return modelJpaRepository.findByPriceGreaterThanEqualAndPriceLessThanEqual(lowest, highest);
+	}
+
+Avec comme test associé dans ModelPersistenceTests:
+
+	@Test
+	public void testGetModelsInPriceRange() throws Exception {
+		List<Model> mods = modelRepository.getModelsInPriceRange(BigDecimal.valueOf(1000L), BigDecimal.valueOf(2000L));
+		assertEquals(4, mods.size());
+	}
+
+Console log:
+
+	select m1_0.id, m1_0.frets, m1_0.manufacturer_id, m1_0.modelType_id, m1_0.name, m1_0.price, m1_0.woodType, m1_0.yearFirstMade from Model as m1_0 where m1_0.price >= ? and m1_0.price <= ?
+
+## Keyword for query Before, After et Betweeen
+
+Utilisation: Utile lorsque vous devez effectuer une comparaison inférieure, supérieure ou d'encadrement avec des types de données date / heure
+
+Exemple Keyword :
+
+	findByFoundedDateBefore(dateObj);
+	findByFoundedDateAfter(dateObj);
+	findByFoundedDateBetween(startDateObj, endDateObj);
+	
+Exemple JPQL :
+	
+	...WHERE a.foundedDate<?1
+	...WHERE a.foundedDate>?1
+	...WHERE a.foundedDate between?1 and ?2
+
+Exemple dans l'interface ManufacturerRepository nous allons ajouter au contrat d'interface la methode:
+	
+	...
+	List<Manufacturer> findByfoundedDateBefore(Date date);
+	...
+
+On refactorise le code suivant à l'aide du proxy dans ManufacturerRepository:
+
+	public List<Manufacturer> getManufacturersFoundedBeforeDate(Date date) {
+		@SuppressWarnings("unchecked")
+		List<Manufacturer> mans = entityManager
+				.createQuery("select m from Manufacturer m where m.foundedDate < :date")
+				.setParameter("date", date).getResultList();
+		return mans;
+	}
+
+
+*Deviens:*
+
+	public List<Manufacturer> getManufacturersFoundedBeforeDate(Date date) {
+			return manufacturerJpaRepository.findByfoundedDateBefore(date);
+		}
+
+Console log:
+	
+	Hibernate: select m1_0.id, m1_0.averageYearlySales, m1_0.foundedDate, m1_0.headquarters_id, m1_0.name from Manufacturer as m1_0 where m1_0.foundedDate < ?
+	
+## Keyword for query True et False (Dans la theorie car je n'arrive pas a le faire fonctionner)
+
+Utilisation: Utile lors de la comparaison de valeurs booléennes avec vrai ou faux
+
+Exemple Keyword :
+
+	findByActiveTrue();
+	findByActiveFalse();
+	
+Exemple JPQL :
+	
+	...WHERE a.active=true;
+	...WHERE a.active=false;
+
+Nous commencerons par ajouter une colonne à notre base de donnée H2 qui recevra une valeur boolean:
+
+Dans /Spring_Data_JPA/src/main/resources/h2/data.sql
+
+	alter table manufacturer add column active boolean not null;
+	
+Puis ajouter dans la colonne Manufacturer les key, valeur:
+
+
+	insert into manufacturer (id, ..., active) values (1,..., true);
+	insert into manufacturer (id, ..., active) values (2,..., false);
+	
+Apres l'execution des test la nouvelles colonne active est créé nous pouvons commenter la ligne
+
+	--alter table manufacturer add column active boolean not null;
+
+Exemple dans l'interface manufacturerJpaRepository
+
+
+	List<Manufacturer> findByActiveTrue();
+	List<Manufacturer> findByActiveFalse();
+	
+**IDE en erreur**
+
+Nous devons alors crée l'attributs membre à la class Manufacturer Active, générer setter et getter.
+Puis ajouter la colonne à la requete
+
+Dans Manufacturer
+
+	...
+	@NamedNativeQuery(name = "Manufacturer.getAllThatSellAcoustics", 
+	query = "SELECT m.id, m.name, m.foundedDate, m.averageYearlySales, m.location_id as headquarters_id, m.active "
+		+ "FROM Manufacturer m "
+	...
+	private Boolean active;
+	...
+		public Boolean getActive() {
+		return active;
+	}
+
+	public void setActive(Boolean active) {
+		this.active = active;
+	}
 	...
 	
-Avec comme test associé:
+On cree le test à l'aide du proxy dans manufacturerPersistenceTests:
+
+	...
+	@Test
+	public void testTrueFalse() throws Exception {
+		List<Manufacturer> mans = manufacturerJpaRepository.findByActiveTrue();
+		assertEquals("Fender Musical Instruments Corporation", mans.get(0).getName());
+		mans = manufacturerJpaRepository.findByActiveFalse();
+		assertEquals("Gibson Guitar Corporation", mans.get(0).getName());
+		
+	}
+
+## Keyword for query IsNull, IsNotNull et NotNull
+
+Utilisation : Utilisé pour vérifier si une valeur de critère est nulle ou non nulle.
+
+Exemple Keyword :
+
+	findByStateIsNull();
+	findByStateIsNotNull();
+	findByStateNotNull();
+	
+Exemple JPQL :
+	
+	...WHERE a.state is null
+	...WHERE a.state not null
+	...WHERE a.state not null
+
+On ajoute dans notre base h2 une valuer null à tester:
+
+	insert into modeltype (id, name) values (8, null)
+
+On ajoute à notre contract d'interface ModelTypeJpaRepository:
+
+	List<ModelType> findByNameIsNull();
+	
+Avec comme test associé dans  ModelTypePersistenceTests:
+
+	@Test
+	public void testForNull() throws Exception{
+		List<ModelType> mts = modelTypeJpaRepository.findByNameIsNull();
+		assertNull(mts.get(0).getName());
+	}
+
+Console log:
+
+	Hibernate: select m1_0.id, m1_0.name from ModelType as m1_0 where m1_0.name is null
+
+## Keyword for query In et NotIn
+
+Utilisation : Utile lorsque vous devez tester si une valeur de colonne fait partie d'une collection ou d'un ensemble de valeurs ou non
+
+Exemple Keyword :
+
+	findByStateIn(Collection<String>states);
+	findByStateNotIn(Collection<String>states);
+
+Exemple JPQL :
+	
+	...WHERE a.state in ? 1
+	...WHERE a.state not in ? 1
+	
+
+
+Exemple dans l'interface ModelJpaRepository:
+
+	List<Model> findByModelTypeNameIn(List<String> types);
 
 	
+Avec comme test associé dans ModelPersistenceTests
+
+	...
+	import static ... assertTrue;
+	...
+	@Test
+	public void testGetModelsByTypes() throws Exception {
+		List<String> types = new ArrayList<String>();
+		types.add("Electric");
+		types.add("Acoustic");
+		List<Model> mods = modelJpaRepository.findByModelTypeNameIn(types);
+		mods.forEach((model) -> {
+			assertTrue(model.getModelType().getName().equals("Electric") || model.getModelType().getName().equals("Acoustic"));
+		});
+	}
+
+
+
+
+
+
+
+### Bug fixe et remarques
+
+Lors de l'execution d'une succession de test il est parfois necessaire de les jouer un par un avant de tous les rejoind dans ce cas preciser le dans le code
+
+		// clear the persistence context so we don't return the previously cached location object
+		// this is a test only thing and normally doesn't need to be done in prod code
+
+Bug non fixe:
+Probleme multiple sur la query True/False
+
+	Failed to create query for method public abstract java.util.List com.guitar.db.repository.ManufacturerJpaRepository.findByActiveTrue()! 
+	
+**ABANDON**

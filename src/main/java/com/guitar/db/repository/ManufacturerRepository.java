@@ -58,7 +58,7 @@ public class ManufacturerRepository {
 	public void delete(Manufacturer man) {
 		manufacturerJpaRepository.delete(man);
 	}
-	
+
 	/**
 	 * Find sans proxy repository
 	 */
@@ -70,14 +70,17 @@ public class ManufacturerRepository {
 	}
 
 	/**
-	 * Custom finder 
+	 * Custom finder sans proxy
 	 */
-	public List<Manufacturer> getManufacturersFoundedBeforeDate(Date date) {
+	/*public List<Manufacturer> getManufacturersFoundedBeforeDate(Date date) {
 		@SuppressWarnings("unchecked")
 		List<Manufacturer> mans = entityManager
 				.createQuery("select m from Manufacturer m where m.foundedDate < :date")
 				.setParameter("date", date).getResultList();
 		return mans;
+	}*/
+	public List<Manufacturer> getManufacturersFoundedBeforeDate(Date date) {
+		return manufacturerJpaRepository.findByfoundedDateBefore(date);
 	}
 
 	/**

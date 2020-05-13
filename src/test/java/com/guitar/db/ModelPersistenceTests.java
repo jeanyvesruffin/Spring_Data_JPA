@@ -87,7 +87,7 @@ public class ModelPersistenceTests {
 	@Test
 	public void testGetModelsInPriceRange() throws Exception {
 		List<Model> mods = modelRepository.getModelsInPriceRange(BigDecimal.valueOf(1000L), BigDecimal.valueOf(2000L));
-		assertEquals(4, mods.size());
+		assertEquals(9, mods.size());
 	}
 
 	@Test
@@ -101,4 +101,15 @@ public class ModelPersistenceTests {
 		List<Model> mods = modelRepository.getModelsByType("Electric");
 		assertEquals(4, mods.size());
 	}
+	
+//	@Test
+//	public void testGetModelsByTypes() throws Exception {
+//		List<String> types = new ArrayList<String>();
+//		types.add("Electric");
+//		types.add("Acoustic");
+//		List<Model> mods = modelJpaRepository.findByModelTypeNameIn(types);
+//		mods.forEach((model) -> {
+//			assertTrue(model.getModelType().getName().equals("Electric") || model.getModelType().getName().equals("Acoustic"));
+//		});
+//	}
 }

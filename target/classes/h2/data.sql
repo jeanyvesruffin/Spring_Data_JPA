@@ -3,6 +3,8 @@ delete modeltype;
 delete manufacturer;
 delete location;
 
+--alter table manufacturer add column activeManufacturer boolean not null;
+
 insert into location (id, country, state) values (1, 'United States', 'Alabama');
 insert into location (id, country, state) values (2, 'United States', 'Alaska');
 insert into location (id, country, state) values (3, 'United States', 'Arizona');
@@ -64,6 +66,8 @@ insert into modeltype (id, name) values (4, 'Electric');
 insert into modeltype (id, name) values (5, 'Hollow Body Electric');
 insert into modeltype (id, name) values (6, 'Semi-Hollow Body Electric');
 insert into modeltype (id, name) values (7, 'Bass');
+insert into modeltype (id, name) values (8, 'null');
+
 
 insert into model (id, name, manufacturer_id, modeltype_id, price, woodtype, yearfirstmade, frets) values (1, 'American Stratocaster', 1, 4, 1000, 'Maple, Alder, Ash, Popular', '1954-01-01', 21);
 insert into model (id, name, manufacturer_id, modeltype_id, price, woodtype, yearfirstmade, frets) values (2, 'American Telecaster', 1, 4, 800, 'Maple, Alder, Ash, Pine', '1950-01-01', 22);

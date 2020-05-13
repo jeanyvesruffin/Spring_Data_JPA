@@ -37,6 +37,16 @@ public class ManufacturerPersistenceTests {
 		List<Manufacturer> mans = manufacturerRepository.getManufacturersFoundedBeforeDate(new Date());
 		assertEquals(2, mans.size());
 	}
+	
+	/**
+	 * Test en echec
+	@Test
+	public void testTrueFalse() throws Exception {
+		List<Manufacturer> mans = manufacturerJpaRepository.findByActiveTrue();
+		assertEquals("Fender Musical Instruments Corporation", mans.get(0).getName());
+		mans = manufacturerJpaRepository.findByActiveFalse();
+		assertEquals("Gibson Guitar Corporation", mans.get(0).getName());
+	}*/
 
 	@Test
 	public void testGetManufactureByName() throws Exception {

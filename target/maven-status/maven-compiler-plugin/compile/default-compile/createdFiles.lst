@@ -1,9 +1,13 @@
 com\guitar\db\model\ModelType.class
+com\guitar\db\repository\LocationJpaRepository.class
 com\guitar\db\repository\ModelTypeRepository.class
 com\guitar\db\model\Manufacturer.class
 com\guitar\db\repository\LocationRepository.class
 com\guitar\db\config\JpaConfiguration.class
+com\guitar\db\repository\ManufacturerJpaRepository.class
 com\guitar\db\repository\ManufacturerRepository.class
 com\guitar\db\model\Location.class
 com\guitar\db\model\Model.class
 com\guitar\db\repository\ModelRepository.class
+com\guitar\db\repository\ModelJpaRepository.class
+com\guitar\db\repository\ModelTypeJpaRepository.class
