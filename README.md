@@ -11,6 +11,30 @@ Nous irons, enfin, plus loin dans les possibilités de query.
 La vérification de la mise en oeuvre de Spring_Data_JPA sera réaliser dans les tests.
 Nous utiliserons un serveur H2 en local.
 
+<!-- TOC -->
+
+- [Spring_Data_JPA](#spring_data_jpa)
+    - [Rappel javax et definition](#rappel-javax-et-definition)
+    - [Installation Spring JPA et test](#installation-spring-jpa-et-test)
+    - [Spring Repositories test](#spring-repositories-test)
+    - [Spring Jpa fonctionalités](#spring-jpa-fonctionalités)
+    - [JpaRepository as proxy](#jparepository-as-proxy)
+    - [Query DSL (Domain Specific Language)](#query-dsl-domain-specific-language)
+    - [Query basic methode syntaxe](#query-basic-methode-syntaxe)
+    - [Query method return types](#query-method-return-types)
+    - [Keyword for query And et Or](#keyword-for-query-and-et-or)
+    - [Keyword for query Equals, Is et Not](#keyword-for-query-equals-is-et-not)
+    - [Keyword for query Like, NotLike](#keyword-for-query-like-notlike)
+    - [Keyword for query startingWith, endingWith et containing](#keyword-for-query-startingwith-endingwith-et-containing)
+    - [Keyword for query LessThan(Equal) et GreaterThan(Equal)](#keyword-for-query-lessthanequal-et-greaterthanequal)
+    - [Keyword for query Before, After et Betweeen](#keyword-for-query-before-after-et-betweeen)
+    - [Keyword for query True et False (Dans la theorie car je n'arrive pas a le faire fonctionner)](#keyword-for-query-true-et-false-dans-la-theorie-car-je-narrive-pas-a-le-faire-fonctionner)
+    - [Keyword for query IsNull, IsNotNull et NotNull](#keyword-for-query-isnull-isnotnull-et-notnull)
+    - [Keyword for query In et NotIn](#keyword-for-query-in-et-notin)
+        - [Bug fixe et remarques](#bug-fixe-et-remarques)
+
+<!-- /TOC -->
+
 ## Rappel javax et definition
 
 **javax.persistence** classe mère nous permettant de maintenir des données persistantes à travers une instance d' EntityManager, annoté, @PersistenceContext
